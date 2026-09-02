@@ -120,7 +120,7 @@
             Your decision will be timestamped and recorded in the permanent clinical audit log.
         </p>
 
-        <form method="POST" action="{{ route('approval.decide', $approvalLink->token) }}" class="space-y-5">
+        <form id="decisionForm" method="POST" action="{{ route('approval.decide', $approvalLink->token) }}" class="space-y-5">
             @csrf
 
             <!-- Decision Options -->
@@ -156,12 +156,29 @@
                 <span class="text-xs text-slate-400">
                     🔒 Single-use token will be consumed upon submission.
                 </span>
-                <button type="submit" class="rounded-xl bg-teal-500 hover:bg-teal-400 px-6 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-teal-950/50 transition">
-                    {{ __('app.submit_decision') }}
+                <button type="submit" id="submitDecisionBtn" class="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-500 hover:bg-teal-400 px-6 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-teal-950/50 transition disabled:opacity-75 disabled:cursor-not-allowed">
+                    <svg id="submitDecisionSpinner" class="hidden animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="submitDecisionText">{{ __('app.submit_decision') }}</span>
                 </button>
             </div>
         </form>
     </div>
 
 </div>
+
+<script>
+    document.getElementById('decisionForm')?.addEventListener('submit', function() {
+        const btn = document.getElementById('submitDecisionBtn');
+        const spinner = document.getElementById('submitDecisionSpinner');
+        const text = document.getElementById('submitDecisionText');
+        if (btn) {
+            btn.disabled = true;
+            spinner?.classList.remove('hidden');
+            if (text) text.textContent = '{{ __('app.submitting_decision') }}';
+        }
+    });
+</script>
 @endsection

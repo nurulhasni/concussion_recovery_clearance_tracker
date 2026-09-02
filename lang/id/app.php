@@ -56,8 +56,11 @@ return [
 
     // Symptoms & Trends
     'symptom_tracking' => 'Tren Gejala 7 Hari Terakhir',
-    'log_daily_symptoms' => 'Catat Laporan Gejala Harian',
-    'enter_symptoms_placeholder' => 'Ceritakan kondisi Anda/anak Anda hari ini dengan bahasa bebas (contoh: Pusing ringan setelah membaca 15 menit, tidak mual, energi membaik...)',
+    'log_daily_symptoms' => 'Catat Gejala Harian',
+    'analyze_and_submit' => 'Analisis & Kirim Laporan',
+    'analyzing_symptoms' => 'Menganalisis Gejala dengan AI...',
+    'submitting_decision' => 'Menyimpan Keputusan...',
+    'enter_symptoms_placeholder' => 'Jelaskan bagaimana perasaan Anda/anak Anda hari ini dengan kata-kata sendiri (contoh: Sakit kepala ringan setelah membaca 15 menit, tidak mual, energi membaik...)',
     'severity_mild' => 'Ringan (Mild)',
     'severity_moderate' => 'Sedang (Moderate)',
     'severity_severe' => 'Berat (Severe)',

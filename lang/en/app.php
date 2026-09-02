@@ -57,6 +57,9 @@ return [
     // Symptoms & Trends
     'symptom_tracking' => '7-Day Symptom Trajectory',
     'log_daily_symptoms' => 'Log Daily Symptoms',
+    'analyze_and_submit' => 'Analyze & Submit Report',
+    'analyzing_symptoms' => 'Analyzing Symptoms with AI...',
+    'submitting_decision' => 'Saving Decision...',
     'enter_symptoms_placeholder' => 'Describe how you/your child are feeling today in your own words (e.g. Mild headache after reading for 15 mins, no nausea, energy is improving...)',
     'severity_mild' => 'Mild',
     'severity_moderate' => 'Moderate',
