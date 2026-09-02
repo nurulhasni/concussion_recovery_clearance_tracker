@@ -1,0 +1,11 @@
+/vendor
+/node_modules
+/.git
+/.env
+/storage/*.key
+/storage/logs/*
+.phpunit.result.cache
+.editorconfig
+.claude
+.impeccable
+.agents

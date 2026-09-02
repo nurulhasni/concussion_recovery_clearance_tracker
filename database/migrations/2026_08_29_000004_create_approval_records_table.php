@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('approval_records', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('patient_id')->constrained('patients')->cascadeOnDelete();
+            $table->integer('stage');
+            $table->string('approver_role'); // doctor | school | parent
+            $table->string('decision'); // approved | rejected
+            $table->text('ai_recommendation')->nullable();
+            $table->timestamp('decided_at');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('approval_records');
+    }
+};
