@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ApprovalLink extends Model
 {
@@ -46,5 +47,13 @@ class ApprovalLink extends Model
     public function patient(): BelongsTo
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    /**
+     * Get the approval record associated with the approval link.
+     */
+    public function approvalRecord(): HasOne
+    {
+        return $this->hasOne(ApprovalRecord::class);
     }
 }

@@ -94,4 +94,29 @@ class SymptomAnalyzerTest extends TestCase
         $this->assertEquals('moderate', $result['severity']);
         $this->assertTrue($result['red_flag']);
     }
+
+    public function test_extract_symptoms_prompt_includes_severity_criteria_and_negation_example(): void
+    {
+        $mockProvider = $this->createMock(AiCompletionProvider::class);
+        $mockProvider->expects($this->once())
+            ->method('complete')
+            ->with($this->callback(function (string $prompt) {
+                return str_contains($prompt, 'SEVERITY CRITERIA:')
+                    && str_contains($prompt, 'mild: no symptoms reported')
+                    && str_contains($prompt, 'zero, no, without, denies, none')
+                    && str_contains($prompt, 'Example: "Felt fine today, zero headache or dizziness" -> severity: "mild", red_flag: false.');
+            }))
+            ->willReturn(json_encode([
+                'severity' => 'mild',
+                'red_flag' => false,
+                'reasoning' => 'No symptoms present.',
+                'extracted_symptoms' => ['none'],
+            ]));
+
+        $analyzer = new SymptomAnalyzer($mockProvider);
+        $result = $analyzer->extractSymptoms('Feeling fine today. Walked for 20 minutes with zero headache, dizziness, or visual fatigue.');
+
+        $this->assertEquals('mild', $result['severity']);
+        $this->assertFalse($result['red_flag']);
+    }
 }

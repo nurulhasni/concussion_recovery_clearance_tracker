@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovalLink;
 use App\Models\Patient;
 use App\Models\SymptomReport;
 use App\Services\SymptomAnalyzer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
 class SymptomReportController extends Controller
 {
@@ -86,6 +88,11 @@ class SymptomReportController extends Controller
 
         $patient->save();
 
+        // Ensure approval links for the upcoming milestone exist without duplicate accumulation
+        if ($isRedFlag && $stageChanged && $patient->current_stage < $previousStage) {
+            $this->generateNextStageApprovalLinks($patient);
+        }
+
         // 4. Build user feedback message
         $feedbackKey = 'success';
         $message = __('app.report_logged_successfully');
@@ -103,5 +110,59 @@ class SymptomReportController extends Controller
         }
 
         return redirect()->route('passport.show', $patient)->with($feedbackKey, $message);
+    }
+
+    /**
+     * Generate new approval links for the patient's next milestone stage if none exist and are active.
+     */
+    private function generateNextStageApprovalLinks(Patient $patient): void
+    {
+        if ($patient->current_stage >= 4) {
+            return;
+        }
+
+        $nextStage = $patient->current_stage + 1;
+        $roles = config('milestone_approvers.'.$nextStage, []);
+
+        foreach ($roles as $role) {
+            // Check if an active, unused link already exists for this stage & role
+            $existingLink = ApprovalLink::where('patient_id', $patient->id)
+                ->where('for_stage', $nextStage)
+                ->where('approver_role', $role)
+                ->where('is_used', false)
+                ->where('expires_at', '>', now())
+                ->first();
+
+            if ($existingLink) {
+                continue;
+            }
+
+            // Reuse patient's most recent approver_name for this role to maintain continuity
+            $latestLink = ApprovalLink::where('patient_id', $patient->id)
+                ->where('approver_role', $role)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $approverName = $latestLink?->approver_name;
+
+            if (! $approverName) {
+                $approverName = match ($role) {
+                    'doctor' => 'Assigned Doctor',
+                    'school' => 'Assigned School Staff',
+                    'parent' => 'Assigned Parent/Guardian',
+                    default => 'Assigned '.ucfirst($role),
+                };
+            }
+
+            ApprovalLink::create([
+                'patient_id' => $patient->id,
+                'for_stage' => $nextStage,
+                'approver_role' => $role,
+                'approver_name' => $approverName,
+                'token' => Str::random(64),
+                'expires_at' => now()->addDays(7),
+                'is_used' => false,
+            ]);
+        }
     }
 }

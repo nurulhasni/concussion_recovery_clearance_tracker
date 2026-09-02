@@ -177,15 +177,22 @@
                         @endforeach
                     </div>
 
-                    <!-- Latest Report Snippet -->
-                    <div class="rounded-xl bg-slate-900/70 p-3 border border-slate-800/80 text-xs text-slate-300">
-                        <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
-                            <span>{{ __('app.reported_on') }}: {{ \Carbon\Carbon::parse($recent_reports->first()->reported_at)->diffForHumans() }}</span>
-                            @if($recent_reports->first()->ai_safety_override)
-                                <span class="text-amber-400 font-semibold">{{ __('app.safety_override_active') }}</span>
-                            @endif
-                        </div>
-                        <p class="italic text-slate-300 line-clamp-2">"{{ $recent_reports->first()->report_text }}"</p>
+                    <!-- Recent Reports (Top 3) -->
+                    <div class="space-y-2 mt-3 max-h-44 overflow-y-auto pr-1">
+                        @foreach($recent_reports->take(3) as $report)
+                            <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs">
+                                <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                                    <span>{{ \Carbon\Carbon::parse($report->reported_at)->format('M d, H:i') }}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        @if($report->ai_safety_override)
+                                            <span class="text-amber-400 font-semibold">{{ __('app.safety_override_active') }}</span>
+                                        @endif
+                                        <span class="font-semibold text-slate-300 uppercase">{{ $report->ai_severity }}</span>
+                                    </div>
+                                </div>
+                                <p class="text-slate-300 italic">"{{ $report->report_text }}"</p>
+                            </div>
+                        @endforeach
                     </div>
                 @else
                     <p class="text-xs text-slate-500 py-6 text-center">{{ __('app.no_reports_yet') }}</p>

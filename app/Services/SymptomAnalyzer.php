@@ -86,6 +86,15 @@ Analyze the following free-text symptom report logged by a student or parent.
 CRITICAL INSTRUCTIONS:
 1. Do NOT diagnose the patient.
 2. Reply ONLY with a valid JSON object. No Markdown code fences, no extra text.
+
+SEVERITY CRITERIA:
+- mild: no symptoms reported, or symptoms are barely noticeable and resolve quickly/on their own. Explicit negations (e.g. 'zero headache', 'no dizziness', 'felt fine') should be classified as mild, not moderate — read negation carefully.
+- moderate: noticeable symptoms that affect daily activity but are manageable with rest/accommodation.
+- severe: symptoms substantially interfere with function, even without meeting a red_flag danger sign.
+Pay close attention to negation words (zero, no, without, denies, none) — a report explicitly denying symptoms must not be classified as moderate or severe based on those symptom words merely being mentioned.
+
+Example: "Felt fine today, zero headache or dizziness" -> severity: "mild", red_flag: false.
+
 3. Response JSON structure:
 {
   "severity": "mild" | "moderate" | "severe",
@@ -103,7 +112,7 @@ CRITICAL INSTRUCTIONS:
    - Weakness, numbness, or loss of motor coordination
    - Clear fluid leaking from nose or ears
    - Unequal pupil sizes
-5. "extracted_symptoms" MUST ALWAYS be in English (for consistent data records).
+5. "extracted_symptoms" MUST ALWAYS be in English (for consistent data records). If symptoms are explicitly negated or no symptoms are present, use ["none"].
 6. "reasoning" MUST be in language '{$locale}' ('en' = English, 'id' = Indonesian).
 
 SYMPTOM REPORT TEXT (NO PII):

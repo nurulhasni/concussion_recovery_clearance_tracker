@@ -51,7 +51,7 @@
                             {{ __('app.logout') }}
                         </a>
                     </div>
-                @elseif(!request()->routeIs('login'))
+                @elseif(!request()->routeIs('login', 'approval.*'))
                     <a href="{{ route('login') }}" class="text-xs text-teal-400 hover:text-teal-300 font-medium px-3 py-1.5 rounded-lg border border-teal-500/30 hover:bg-teal-950/30 transition">
                         {{ __('app.login') }}
                     </a>

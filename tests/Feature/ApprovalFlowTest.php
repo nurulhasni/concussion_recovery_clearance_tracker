@@ -5,12 +5,13 @@ namespace Tests\Feature;
 use App\Contracts\AiCompletionProvider;
 use App\Models\ApprovalLink;
 use App\Models\Patient;
+use App\Traits\BuildsRecoveryContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ApprovalFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use BuildsRecoveryContext, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -48,6 +49,37 @@ class ApprovalFlowTest extends TestCase
         $response->assertSee('Test Athlete');
         $response->assertSee('Dr. Smith');
         $response->assertSee('Submit Clearance Decision');
+        $response->assertSee('Submit Decision');
+        $response->assertDontSee(route('login'));
+        $response->assertDontSee('checked');
+    }
+
+    public function test_approval_portal_in_indonesian_renders_submit_decision_and_hides_login(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Indonesian Athlete',
+            'injury_type' => 'Collision',
+            'injury_date' => now()->subDays(4)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'id@example.com',
+        ]);
+
+        $link = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Budi',
+            'token' => 'id-test-token-portal-999',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        $response = $this->withSession(['locale' => 'id'])->get("/approve/{$link->token}");
+
+        $response->assertStatus(200);
+        $response->assertSee('Kirim Keputusan');
+        $response->assertDontSee(route('login'));
+        $response->assertDontSee('checked');
     }
 
     public function test_get_approve_token_returns_404_when_token_is_used_replay_prevention(): void
@@ -160,8 +192,9 @@ class ApprovalFlowTest extends TestCase
         $link->refresh();
         $this->assertTrue($link->is_used);
 
-        // Record must be stored with comments and AI recommendation
+        // Record must be stored with comments, AI recommendation, and approval_link_id
         $this->assertDatabaseHas('approval_records', [
+            'approval_link_id' => $link->id,
             'patient_id' => $patient->id,
             'stage' => 2,
             'approver_role' => 'doctor',
@@ -296,5 +329,219 @@ class ApprovalFlowTest extends TestCase
         $patient->refresh();
         // Stage MUST remain at 2
         $this->assertEquals(2, $patient->current_stage);
+    }
+
+    public function test_milestone_advance_generates_approval_links_for_next_stage_with_consistent_approver_names(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Progression Athlete',
+            'injury_type' => 'Contact during hockey match',
+            'injury_date' => now()->subDays(5)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'parent@example.com',
+        ]);
+
+        $stage2DoctorLink = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Gregory House, MD',
+            'token' => 'stage2-doctor-token-unique-test-1234567890123456789012345678901234',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // Approve stage 2 milestone
+        $response = $this->post("/approve/{$stage2DoctorLink->token}", [
+            'decision' => 'approved',
+            'comments' => 'Cleared for school recovery stage.',
+        ]);
+
+        $response->assertStatus(200);
+
+        $patient->refresh();
+        $this->assertEquals(2, $patient->current_stage);
+
+        // Required roles for Stage 3 from config
+        $expectedRoles = config('milestone_approvers.3');
+        $this->assertEquals(['doctor', 'school'], $expectedRoles);
+
+        $stage3Links = ApprovalLink::where('patient_id', $patient->id)
+            ->where('for_stage', 3)
+            ->get();
+
+        $this->assertCount(count($expectedRoles), $stage3Links);
+
+        // Doctor link should reuse Dr. Gregory House
+        $doctorLink = $stage3Links->firstWhere('approver_role', 'doctor');
+        $this->assertNotNull($doctorLink);
+        $this->assertEquals('Dr. Gregory House, MD', $doctorLink->approver_name);
+        $this->assertEquals(64, strlen($doctorLink->token));
+        $this->assertFalse($doctorLink->is_used);
+        $this->assertTrue($doctorLink->expires_at->isFuture());
+
+        // School link should use fallback since no previous school link existed
+        $schoolLink = $stage3Links->firstWhere('approver_role', 'school');
+        $this->assertNotNull($schoolLink);
+        $this->assertNotEmpty($schoolLink->approver_name);
+        $this->assertEquals('Assigned School Staff', $schoolLink->approver_name);
+        $this->assertEquals(64, strlen($schoolLink->token));
+        $this->assertFalse($schoolLink->is_used);
+        $this->assertTrue($schoolLink->expires_at->isFuture());
+
+        // Tokens must be distinct
+        $this->assertNotEquals($doctorLink->token, $schoolLink->token);
+    }
+
+    public function test_advance_does_not_duplicate_existing_active_unused_links_but_regenerates_if_expired(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Dedup Patient',
+            'injury_type' => 'Practice fall',
+            'injury_date' => now()->subDays(7)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'parent@example.com',
+        ]);
+
+        $stage2DoctorLink = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Wilson',
+            'token' => 'active-stage2-token-unique-test-12345678901234567890123456789012',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // Pre-create an active doctor link for stage 3
+        $preExistingDoctorLink = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 3,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Wilson',
+            'token' => 'pre-existing-active-doctor-stage3-token-1234567890123456789012345',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // Pre-create an EXPIRED school link for stage 3 (should be regenerated)
+        $expiredSchoolLink = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 3,
+            'approver_role' => 'school',
+            'approver_name' => 'Old School Staff',
+            'token' => 'expired-school-stage3-token-123456789012345678901234567890123456',
+            'expires_at' => now()->subDay(),
+            'is_used' => false,
+        ]);
+
+        // Approve stage 2
+        $this->post("/approve/{$stage2DoctorLink->token}", ['decision' => 'approved']);
+
+        $patient->refresh();
+        $this->assertEquals(2, $patient->current_stage);
+
+        // Doctor link for stage 3 should not have been duplicated
+        $stage3DoctorLinks = ApprovalLink::where('patient_id', $patient->id)
+            ->where('for_stage', 3)
+            ->where('approver_role', 'doctor')
+            ->where('is_used', false)
+            ->get();
+        $this->assertCount(1, $stage3DoctorLinks);
+        $this->assertEquals($preExistingDoctorLink->id, $stage3DoctorLinks->first()->id);
+
+        // School link should have a new active link generated because the old one was expired
+        $activeStage3SchoolLinks = ApprovalLink::where('patient_id', $patient->id)
+            ->where('for_stage', 3)
+            ->where('approver_role', 'school')
+            ->where('is_used', false)
+            ->where('expires_at', '>', now())
+            ->get();
+        $this->assertCount(1, $activeStage3SchoolLinks);
+        $this->assertNotEquals($expiredSchoolLink->id, $activeStage3SchoolLinks->first()->id);
+        // And it reused the approver_name 'Old School Staff'
+        $this->assertEquals('Old School Staff', $activeStage3SchoolLinks->first()->approver_name);
+    }
+
+    public function test_downgraded_patient_new_link_shows_pending_and_is_not_falsely_satisfied_by_old_record(): void
+    {
+        // 1. Athlete at stage 1
+        $patient = Patient::create([
+            'name' => 'Cycle Athlete',
+            'injury_type' => 'Impact',
+            'injury_date' => now()->subDays(6)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'cycle@example.com',
+        ]);
+
+        $initialDoctorLink = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Cycle Doctor',
+            'token' => 'cycle-doctor-stage2-token-initial-1234567890123456789012345678901234',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // (a) Approve patient from stage 1 to stage 2
+        $this->post("/approve/{$initialDoctorLink->token}", [
+            'decision' => 'approved',
+            'comments' => 'Initial stage 2 clearance granted.',
+        ]);
+
+        $patient->refresh();
+        $this->assertEquals(2, $patient->current_stage);
+
+        // Verify old ApprovalRecord exists with approval_link_id
+        $this->assertDatabaseHas('approval_records', [
+            'patient_id' => $patient->id,
+            'stage' => 2,
+            'approver_role' => 'doctor',
+            'decision' => 'approved',
+            'approval_link_id' => $initialDoctorLink->id,
+        ]);
+
+        // (b) Simulate a red-flag-triggered downgrade back to stage 1
+        $mockProvider = $this->createMock(AiCompletionProvider::class);
+        $mockProvider->method('complete')->willReturn(json_encode([
+            'severity' => 'severe',
+            'red_flag' => true,
+            'reasoning' => 'Severe recurrent headache and confusion.',
+            'extracted_symptoms' => ['severe headache', 'confusion'],
+        ]));
+        $this->app->instance(AiCompletionProvider::class, $mockProvider);
+
+        $this->withSession([
+            'authenticated_patient_id' => $patient->id,
+        ])->post('/symptom-reports', [
+            'patient_id' => $patient->id,
+            'report_text' => 'Severe headache and confusion returned today.',
+        ]);
+
+        $patient->refresh();
+        $this->assertEquals(1, $patient->current_stage);
+
+        // (c) Verify a NEW ApprovalLink for stage 2/doctor exists and is_used=false
+        $newDoctorLink = ApprovalLink::where('patient_id', $patient->id)
+            ->where('for_stage', 2)
+            ->where('approver_role', 'doctor')
+            ->where('is_used', false)
+            ->first();
+
+        $this->assertNotNull($newDoctorLink);
+        $this->assertNotEquals($initialDoctorLink->id, $newDoctorLink->id);
+        $this->assertFalse($newDoctorLink->is_used);
+
+        // (d) Verify that when viewing this patient's context (buildContext), the doctor's approval status for stage 2 shows 'pending', NOT 'approved'
+        $context = $this->buildContext($patient);
+        $approvalStatuses = collect($context['approval_statuses']);
+        $doctorStatus = $approvalStatuses->firstWhere('role', 'doctor');
+
+        $this->assertNotNull($doctorStatus);
+        $this->assertEquals('pending', $doctorStatus['status']);
+        $this->assertNotEquals('approved', $doctorStatus['status']);
+        $this->assertEquals($newDoctorLink->token, $doctorStatus['token']);
+        $this->assertFalse($context['all_approvals_ready']);
     }
 }

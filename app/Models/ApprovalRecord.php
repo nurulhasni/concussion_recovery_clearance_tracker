@@ -17,6 +17,7 @@ class ApprovalRecord extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'approval_link_id',
         'patient_id',
         'stage',
         'approver_role',
@@ -45,5 +46,13 @@ class ApprovalRecord extends Model
     public function patient(): BelongsTo
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    /**
+     * Get the approval link associated with the approval record.
+     */
+    public function approvalLink(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalLink::class);
     }
 }

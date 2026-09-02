@@ -62,19 +62,24 @@ trait BuildsRecoveryContext
         $targetStage = $patient->current_stage + 1;
         $approvalLinks = $patient->approvalLinks()
             ->where('for_stage', $targetStage)
-            ->get();
-
-        $approvalRecords = $patient->approvalRecords()
-            ->where('stage', $targetStage)
+            ->orderBy('is_used', 'asc')
+            ->orderByDesc('created_at')
             ->get()
-            ->keyBy('approver_role');
+            ->unique('approver_role')
+            ->values();
+
+        $linkIds = $approvalLinks->pluck('id');
+        $approvalRecords = $patient->approvalRecords()
+            ->whereIn('approval_link_id', $linkIds)
+            ->get()
+            ->keyBy('approval_link_id');
 
         $approvalStatuses = [];
         $approvedCount = 0;
         $totalRequired = $approvalLinks->count();
 
         foreach ($approvalLinks as $link) {
-            $record = $approvalRecords->get($link->approver_role);
+            $record = $approvalRecords->get($link->id);
             $status = 'pending';
             $decidedAt = null;
 

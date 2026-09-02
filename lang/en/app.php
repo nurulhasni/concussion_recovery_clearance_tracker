@@ -86,6 +86,7 @@ return [
     'decision_notes' => 'Clinical / Reviewer Notes',
     'approve_action' => 'Approve Milestone Advancement',
     'reject_action' => 'Reject / Hold at Current Stage',
+    'submit_decision' => 'Submit Decision',
     'demo_link_notice' => 'Demo Testing Link (Simulated Approver URL)',
     'copy_link' => 'Copy Approval Link',
     'open_link' => 'Open Review Portal',

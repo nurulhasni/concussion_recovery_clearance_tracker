@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Traits\BuildsRecoveryContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ApprovalController extends Controller
@@ -76,6 +77,7 @@ class ApprovalController extends Controller
         $aiRecommendation = $context['ai_insight'] ?? null;
 
         ApprovalRecord::create([
+            'approval_link_id' => $approvalLink->id,
             'patient_id' => $patient->id,
             'stage' => $approvalLink->for_stage,
             'approver_role' => $approvalLink->approver_role,
@@ -91,19 +93,23 @@ class ApprovalController extends Controller
         ]);
 
         // 3. Multi-Party Consensus Check:
-        // Check if ALL required approvers for this patient & target stage have approved.
+        // Check if ALL required approvers for this patient's current milestone cycle have approved.
         $targetStage = $approvalLink->for_stage;
-        $totalRequiredLinks = ApprovalLink::where('patient_id', $patient->id)
+        $currentLinks = ApprovalLink::where('patient_id', $patient->id)
             ->where('for_stage', $targetStage)
-            ->count();
+            ->orderBy('is_used', 'asc')
+            ->orderByDesc('created_at')
+            ->get()
+            ->unique('approver_role');
 
-        $approvedRecordsCount = ApprovalRecord::where('patient_id', $patient->id)
-            ->where('stage', $targetStage)
+        $currentLinkIds = $currentLinks->pluck('id');
+        $totalRequiredLinks = $currentLinks->count();
+
+        $approvedRecordsCount = ApprovalRecord::whereIn('approval_link_id', $currentLinkIds)
             ->where('decision', 'approved')
             ->count();
 
-        $rejectedRecordsCount = ApprovalRecord::where('patient_id', $patient->id)
-            ->where('stage', $targetStage)
+        $rejectedRecordsCount = ApprovalRecord::whereIn('approval_link_id', $currentLinkIds)
             ->where('decision', 'rejected')
             ->count();
 
@@ -122,6 +128,10 @@ class ApprovalController extends Controller
 
             $patient->save();
             $milestoneAdvanced = true;
+
+            if ($patient->current_stage < 4) {
+                $this->generateNextStageApprovalLinks($patient);
+            }
         }
 
         return view('approval.confirmed', [
@@ -131,5 +141,59 @@ class ApprovalController extends Controller
             'milestoneAdvanced' => $milestoneAdvanced,
             'targetStage' => $targetStage,
         ]);
+    }
+
+    /**
+     * Generate new approval links for the patient's next milestone stage if none exist and are active.
+     */
+    private function generateNextStageApprovalLinks(Patient $patient): void
+    {
+        if ($patient->current_stage >= 4) {
+            return;
+        }
+
+        $nextStage = $patient->current_stage + 1;
+        $roles = config('milestone_approvers.'.$nextStage, []);
+
+        foreach ($roles as $role) {
+            // Check if an active, unused link already exists for this stage & role
+            $existingLink = ApprovalLink::where('patient_id', $patient->id)
+                ->where('for_stage', $nextStage)
+                ->where('approver_role', $role)
+                ->where('is_used', false)
+                ->where('expires_at', '>', now())
+                ->first();
+
+            if ($existingLink) {
+                continue;
+            }
+
+            // Reuse patient's most recent approver_name for this role to maintain continuity
+            $latestLink = ApprovalLink::where('patient_id', $patient->id)
+                ->where('approver_role', $role)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $approverName = $latestLink?->approver_name;
+
+            if (! $approverName) {
+                $approverName = match ($role) {
+                    'doctor' => 'Assigned Doctor',
+                    'school' => 'Assigned School Staff',
+                    'parent' => 'Assigned Parent/Guardian',
+                    default => 'Assigned '.ucfirst($role),
+                };
+            }
+
+            ApprovalLink::create([
+                'patient_id' => $patient->id,
+                'for_stage' => $nextStage,
+                'approver_role' => $role,
+                'approver_name' => $approverName,
+                'token' => Str::random(64),
+                'expires_at' => now()->addDays(7),
+                'is_used' => false,
+            ]);
+        }
     }
 }

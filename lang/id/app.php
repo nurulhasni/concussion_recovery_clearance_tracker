@@ -86,6 +86,7 @@ return [
     'decision_notes' => 'Catatan Peninjau / Klinis',
     'approve_action' => 'Setujui Kenaikan Tahap',
     'reject_action' => 'Tolak / Tahan di Tahap Saat Ini',
+    'submit_decision' => 'Kirim Keputusan',
     'demo_link_notice' => 'Tautan Pengujian Demo (Simulasi Approver)',
     'copy_link' => 'Salin Tautan Persetujuan',
     'open_link' => 'Buka Portal Persetujuan',
