@@ -104,6 +104,18 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Reset Demo Database Action -->
+            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center">
+                <a href="{{ route('demo.reset') }}" 
+                   onclick="return confirm('Reset all demo patients, symptom reports, and approval records to initial state?');"
+                   class="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-rose-400 transition py-1 px-2.5 rounded-lg hover:bg-slate-900 border border-transparent hover:border-rose-950">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Reset Demo Database (migrate:fresh --seed)</span>
+                </a>
+            </div>
         </div>
 
     </div>

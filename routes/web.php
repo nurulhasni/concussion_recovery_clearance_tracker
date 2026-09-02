@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PassportController;
 use App\Http\Controllers\SymptomReportController;
 use App\Models\Patient;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,10 +51,12 @@ Route::middleware('auth.patient')->group(function () {
 Route::get('/approve/{token}', [ApprovalController::class, 'show'])->name('approval.show');
 Route::post('/approve/{token}', [ApprovalController::class, 'decide'])->name('approval.decide');
 
-// Manual demo data seed route (useful for serverless/free hosting without shell access)
-Route::get('/seed-demo-data', function () {
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+// Reset & Fresh Seed Demo Database (Useful for live prototypes / free hosting without shell)
+Route::match(['get', 'post'], '/reset-database', function () {
+    Artisan::call('migrate:fresh', [
+        '--force' => true,
+        '--seed' => true,
+    ]);
 
-    return redirect()->route('login')->with('success', 'Demo data seeded successfully!');
-})->name('demo.seed');
-
+    return redirect()->route('login')->with('success', 'Database successfully reset to initial demo state (migrate:fresh --seed)!');
+})->name('demo.reset');
