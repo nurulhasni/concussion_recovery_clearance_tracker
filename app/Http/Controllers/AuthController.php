@@ -16,6 +16,10 @@ class AuthController extends Controller
      */
     public function showLoginForm(): View
     {
+        if (Patient::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        }
+
         $demoPatients = Patient::all();
 
         return view('auth.login', compact('demoPatients'));

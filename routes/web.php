@@ -49,3 +49,11 @@ Route::middleware('auth.patient')->group(function () {
 // One-time Token-based Approvals (Doctors, Schools, Parents - No Login Required)
 Route::get('/approve/{token}', [ApprovalController::class, 'show'])->name('approval.show');
 Route::post('/approve/{token}', [ApprovalController::class, 'decide'])->name('approval.decide');
+
+// Manual demo data seed route (useful for serverless/free hosting without shell access)
+Route::get('/seed-demo-data', function () {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+
+    return redirect()->route('login')->with('success', 'Demo data seeded successfully!');
+})->name('demo.seed');
+
