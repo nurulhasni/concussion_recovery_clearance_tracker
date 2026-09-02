@@ -37,7 +37,18 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5">
+                <!-- Platform & Demo Guide Modal Trigger -->
+                <button type="button" 
+                        onclick="document.getElementById('guideModal').classList.remove('hidden')"
+                        class="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 text-xs font-semibold text-teal-300 border border-teal-500/30 hover:border-teal-500/60 transition shadow-sm"
+                        title="Platform Features & 3-Minute Demo Cheat Sheet">
+                    <svg class="h-3.5 w-3.5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Guide & Demo Flow</span>
+                </button>
+
                 <span class="hidden md:inline-flex items-center rounded-full bg-slate-900/90 px-2.5 py-0.5 text-xs font-semibold text-slate-300 border border-slate-700/80 shadow-sm">
                     {{ __('app.demo_mode') }}
                 </span>
@@ -114,6 +125,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Platform & Demo Guide Modal -->
+    @include('partials.guide-modal')
 
     @stack('scripts')
 </body>
