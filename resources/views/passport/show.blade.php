@@ -324,6 +324,17 @@
                                 {{ __('app.timestamp') }}: {{ \Carbon\Carbon::parse($approval['decided_at'])->format('M d, H:i') }}
                             </div>
                         @endif
+                        @if(!empty($approval['comments']))
+                            <div class="mt-3 rounded-lg border {{ $approval['status'] === 'rejected' ? 'border-rose-500/30 bg-rose-950/30 text-rose-200' : 'border-slate-800 bg-slate-950/50 text-slate-300' }} p-2.5 text-xs">
+                                <div class="font-semibold text-[11px] {{ $approval['status'] === 'rejected' ? 'text-rose-300' : 'text-slate-400' }} mb-1 flex items-center gap-1.5">
+                                    <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                    </svg>
+                                    <span>{{ __('app.decision_notes') }}</span>
+                                </div>
+                                <p class="italic leading-relaxed">"{{ $approval['comments'] }}"</p>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>

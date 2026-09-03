@@ -20,33 +20,34 @@
 
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-40 border-b border-white/[0.08] bg-slate-950/80 backdrop-blur-xl shadow-lg shadow-black/20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-teal-500 to-cyan-400 p-0.5 shadow-lg shadow-teal-500/20 ring-1 ring-white/20 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-tr from-teal-500 to-cyan-400 p-0.5 shadow-lg shadow-teal-500/20 ring-1 ring-white/20 flex items-center justify-center shrink-0">
+                    <svg class="h-4 w-4 sm:h-5 sm:w-5 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 </div>
-                <div>
-                    <a href="{{ url('/') }}" class="text-base font-bold tracking-tight text-white hover:text-teal-300 transition flex items-center gap-2">
-                        {{ __('app.app_name') }}
+                <div class="min-w-0">
+                    <a href="{{ url('/') }}" class="text-sm sm:text-base font-bold tracking-tight text-white hover:text-teal-300 transition truncate flex items-center gap-1.5" title="{{ __('app.app_name') }}">
+                        <span class="sm:hidden">Recovery</span>
+                        <span class="hidden sm:inline">{{ __('app.app_name') }}</span>
                     </a>
-                    <span class="hidden sm:inline-block text-[11px] text-teal-400/90 font-medium">
+                    <span class="hidden sm:inline-block text-[11px] text-teal-400/90 font-medium truncate">
                         CDC HEADS UP & PedsConcussion Framework
                     </span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 <!-- Platform & Demo Guide Modal Trigger -->
                 <button type="button" 
                         onclick="document.getElementById('guideModal').classList.remove('hidden')"
-                        class="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 px-3 py-1 text-xs font-semibold text-teal-300 border border-teal-500/30 hover:border-teal-500/60 transition shadow-sm"
+                        class="inline-flex items-center justify-center gap-1.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 p-2 sm:px-3 sm:py-1 text-xs font-semibold text-teal-300 border border-teal-500/30 hover:border-teal-500/60 transition shadow-sm shrink-0"
                         title="Platform Features & 3-Minute Demo Cheat Sheet">
-                    <svg class="h-3.5 w-3.5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-4 w-4 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Guide & Demo Flow</span>
+                    <span class="hidden sm:inline">Guide & Demo Flow</span>
                 </button>
 
                 <span class="hidden md:inline-flex items-center rounded-full bg-slate-900/90 px-2.5 py-0.5 text-xs font-semibold text-slate-300 border border-slate-700/80 shadow-sm">
@@ -57,16 +58,21 @@
                 @include('partials.language-switcher')
 
                 @if(session('authenticated_patient_id'))
-                    <div class="flex items-center gap-2 pl-2 border-l border-slate-800">
+                    <div class="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 border-l border-slate-800">
                         <span class="hidden lg:inline text-xs text-slate-400">
                             {{ __('app.logged_in_as') }} <strong class="text-slate-200">{{ session('authenticated_patient_name') }}</strong>
                         </span>
-                        <a href="{{ route('logout') }}" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 rounded-lg hover:bg-rose-950/40 transition">
-                            {{ __('app.logout') }}
+                        <a href="{{ route('logout') }}" 
+                           class="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 rounded-lg hover:bg-rose-950/40 transition"
+                           title="{{ __('app.logout') }}">
+                            <svg class="h-4 w-4 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span class="hidden sm:inline">{{ __('app.logout') }}</span>
                         </a>
                     </div>
                 @elseif(!request()->routeIs('login', 'approval.*'))
-                    <a href="{{ route('login') }}" class="text-xs text-teal-300 hover:text-teal-200 font-semibold px-3 py-1.5 rounded-lg border border-teal-500/40 hover:bg-teal-950/40 transition shadow-sm">
+                    <a href="{{ route('login') }}" class="text-xs text-teal-300 hover:text-teal-200 font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-teal-500/40 hover:bg-teal-950/40 transition shadow-sm">
                         {{ __('app.login') }}
                     </a>
                 @endif

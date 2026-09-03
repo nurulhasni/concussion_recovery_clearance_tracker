@@ -42,6 +42,18 @@
             </div>
         @endif
 
+        @if(!empty($comments))
+            <div class="mb-6 rounded-xl border {{ $decision === 'rejected' ? 'border-rose-500/30 bg-rose-950/30 text-rose-200' : 'border-slate-800 bg-slate-900/60 text-slate-300' }} p-3.5 text-xs text-left">
+                <div class="font-semibold text-xs {{ $decision === 'rejected' ? 'text-rose-300' : 'text-slate-400' }} mb-1 flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <span>{{ __('app.decision_notes') }}</span>
+                </div>
+                <p class="italic leading-relaxed">"{{ $comments }}"</p>
+            </div>
+        @endif
+
         <div class="pt-4 border-t border-slate-800">
             <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-700 px-5 py-2.5 text-xs font-bold text-slate-200 transition border border-slate-700">
                 Return to Sign In

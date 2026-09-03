@@ -82,10 +82,12 @@ trait BuildsRecoveryContext
             $record = $approvalRecords->get($link->id);
             $status = 'pending';
             $decidedAt = null;
+            $comments = null;
 
             if ($record) {
                 $status = $record->decision; // 'approved' or 'rejected'
                 $decidedAt = $record->decided_at;
+                $comments = $record->comments;
             } elseif ($link->is_used) {
                 $status = 'processed';
             } elseif (Carbon::parse($link->expires_at)->isPast()) {
@@ -105,6 +107,7 @@ trait BuildsRecoveryContext
                 'is_used' => $link->is_used,
                 'expires_at' => $link->expires_at,
                 'decided_at' => $decidedAt,
+                'comments' => $comments,
             ];
         }
 

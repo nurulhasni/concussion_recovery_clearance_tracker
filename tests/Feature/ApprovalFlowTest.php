@@ -544,4 +544,144 @@ class ApprovalFlowTest extends TestCase
         $this->assertEquals($newDoctorLink->token, $doctorStatus['token']);
         $this->assertFalse($context['all_approvals_ready']);
     }
+
+    public function test_rejection_requires_comments_with_custom_message(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Validation Test Patient',
+            'injury_type' => 'Practice fall',
+            'injury_date' => now()->subDays(4)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'valid@example.com',
+        ]);
+
+        $link = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Reviewer',
+            'token' => 'validation-test-reject-token-1234567890123456789012345678901234',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // Rejection without comments must fail validation
+        $response = $this->from("/approve/{$link->token}")
+            ->post("/approve/{$link->token}", [
+                'decision' => 'rejected',
+                'comments' => '',
+            ]);
+
+        $response->assertRedirect("/approve/{$link->token}");
+        $response->assertSessionHasErrors([
+            'comments' => "Please explain why this milestone is being held, so the patient/parent and other approvers understand what's needed next.",
+        ]);
+
+        $this->assertDatabaseMissing('approval_records', [
+            'patient_id' => $patient->id,
+            'decision' => 'rejected',
+        ]);
+        $link->refresh();
+        $this->assertFalse($link->is_used);
+
+        // Rejection with comments must succeed
+        $successResponse = $this->post("/approve/{$link->token}", [
+            'decision' => 'rejected',
+            'comments' => 'Still experiencing dizziness under light exertion.',
+        ]);
+
+        $successResponse->assertStatus(200);
+        $this->assertDatabaseHas('approval_records', [
+            'patient_id' => $patient->id,
+            'decision' => 'rejected',
+            'comments' => 'Still experiencing dizziness under light exertion.',
+        ]);
+        $link->refresh();
+        $this->assertTrue($link->is_used);
+    }
+
+    public function test_approval_decision_does_not_require_comments(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Approval Optional Comments Patient',
+            'injury_type' => 'Soccer collision',
+            'injury_date' => now()->subDays(7)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'soccer@example.com',
+        ]);
+
+        $link = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Optional',
+            'token' => 'optional-comments-token-123456789012345678901234567890123456',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        // Approval with empty comments must succeed without validation errors
+        $response = $this->post("/approve/{$link->token}", [
+            'decision' => 'approved',
+            'comments' => '',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('approval_records', [
+            'patient_id' => $patient->id,
+            'decision' => 'approved',
+            'comments' => null,
+        ]);
+        $link->refresh();
+        $this->assertTrue($link->is_used);
+    }
+
+    public function test_rejection_comments_are_displayed_in_confirmed_view_and_recovery_passport(): void
+    {
+        $patient = Patient::create([
+            'name' => 'Notes Display Patient',
+            'injury_type' => 'Practice fall',
+            'injury_date' => now()->subDays(3)->toDateString(),
+            'current_stage' => 1,
+            'parent_email' => 'notes@example.com',
+        ]);
+
+        $link = ApprovalLink::create([
+            'patient_id' => $patient->id,
+            'for_stage' => 2,
+            'approver_role' => 'doctor',
+            'approver_name' => 'Dr. Neurologist',
+            'token' => 'rejection-notes-token-123456789012345678901234567890123456',
+            'expires_at' => now()->addDays(5),
+            'is_used' => false,
+        ]);
+
+        $clinicalNote = 'Patient exhibits persistent photophobia. Hold at Milestone 1 for 48 more hours.';
+
+        // 1. Submit rejection with clinical note
+        $response = $this->post("/approve/{$link->token}", [
+            'decision' => 'rejected',
+            'comments' => $clinicalNote,
+        ]);
+
+        $response->assertStatus(200);
+        // Confirmed view must display the submitted clinical note
+        $response->assertSee($clinicalNote);
+        $response->assertSee('holding at current stage based on clinical review');
+
+        // 2. Trait context must include comments
+        $context = $this->buildContext($patient);
+        $doctorStatus = collect($context['approval_statuses'])->firstWhere('role', 'doctor');
+        $this->assertEquals($clinicalNote, $doctorStatus['comments']);
+
+        // 3. Recovery Passport dashboard must display the clinical note
+        $passportResponse = $this->withSession([
+            'authenticated_patient_id' => $patient->id,
+            'authenticated_patient_name' => $patient->name,
+        ])->get(route('passport.show', $patient));
+
+        $passportResponse->assertStatus(200);
+        $passportResponse->assertSee($clinicalNote);
+        $passportResponse->assertSee('Dr. Neurologist');
+    }
 }

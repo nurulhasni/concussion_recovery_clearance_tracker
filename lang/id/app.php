@@ -87,6 +87,8 @@ return [
     'decision' => 'Keputusan',
     'timestamp' => 'Waktu Keputusan',
     'decision_notes' => 'Catatan Peninjau / Klinis',
+    'notes_required_if_holding' => 'wajib diisi jika menahan/menolak',
+    'comments_required_if_rejected' => 'Mohon jelaskan alasan penahanan tahap ini, agar pasien/orang tua dan peninjau lain memahami langkah yang diperlukan selanjutnya.',
     'approve_action' => 'Setujui Kenaikan Tahap',
     'reject_action' => 'Tolak / Tahan di Tahap Saat Ini',
     'submit_decision' => 'Kirim Keputusan',

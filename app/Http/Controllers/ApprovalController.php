@@ -52,7 +52,9 @@ class ApprovalController extends Controller
     {
         $validated = $request->validate([
             'decision' => ['required', 'in:approved,rejected'],
-            'comments' => ['nullable', 'string', 'max:1000'],
+            'comments' => ['nullable', 'required_if:decision,rejected', 'string', 'max:1000'],
+        ], [
+            'comments.required_if' => __('app.comments_required_if_rejected'),
         ]);
 
         /** @var ApprovalLink|null $approvalLink */
@@ -138,6 +140,7 @@ class ApprovalController extends Controller
             'patient' => $patient,
             'approvalLink' => $approvalLink,
             'decision' => $validated['decision'],
+            'comments' => $validated['comments'] ?? null,
             'milestoneAdvanced' => $milestoneAdvanced,
             'targetStage' => $targetStage,
         ]);

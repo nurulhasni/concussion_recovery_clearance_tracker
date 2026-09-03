@@ -87,6 +87,8 @@ return [
     'decision' => 'Decision',
     'timestamp' => 'Timestamp',
     'decision_notes' => 'Clinical / Reviewer Notes',
+    'notes_required_if_holding' => 'required if holding/rejecting',
+    'comments_required_if_rejected' => "Please explain why this milestone is being held, so the patient/parent and other approvers understand what's needed next.",
     'approve_action' => 'Approve Milestone Advancement',
     'reject_action' => 'Reject / Hold at Current Stage',
     'submit_decision' => 'Submit Decision',

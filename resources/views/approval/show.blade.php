@@ -144,12 +144,22 @@
 
             <!-- Notes / Comments -->
             <div>
-                <label for="comments" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                    {{ __('app.decision_notes') }} (Optional)
+                <label for="comments" class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <span>{{ __('app.decision_notes') }}</span>
+                    <span id="commentsRequirementLabel" class="text-slate-400 font-normal">({{ __('app.notes_required_if_holding') }})</span>
+                    <span id="requiredAsterisk" class="text-rose-400 font-bold hidden">*</span>
                 </label>
                 <textarea id="comments" name="comments" rows="3"
                           placeholder="Provide clinical observations, specific accommodation adjustments, or instructions for parents/school..."
-                          class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 transition"></textarea>
+                          class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 transition">{{ old('comments') }}</textarea>
+                @error('comments')
+                    <p class="mt-1.5 text-xs text-rose-400 font-semibold flex items-center gap-1">
+                        <svg class="h-3.5 w-3.5 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{{ $message }}</span>
+                    </p>
+                @enderror
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-800">
@@ -170,15 +180,54 @@
 </div>
 
 <script>
-    document.getElementById('decisionForm')?.addEventListener('submit', function() {
-        const btn = document.getElementById('submitDecisionBtn');
-        const spinner = document.getElementById('submitDecisionSpinner');
-        const text = document.getElementById('submitDecisionText');
-        if (btn) {
-            btn.disabled = true;
-            spinner?.classList.remove('hidden');
-            if (text) text.textContent = '{{ __('app.submitting_decision') }}';
+    document.addEventListener('DOMContentLoaded', function() {
+        const decisionRadios = document.querySelectorAll('input[name="decision"]');
+        const commentsTextarea = document.getElementById('comments');
+        const commentsRequirementLabel = document.getElementById('commentsRequirementLabel');
+        const requiredAsterisk = document.getElementById('requiredAsterisk');
+
+        function updateRequirementState(isRejected) {
+            if (isRejected) {
+                commentsTextarea?.setAttribute('required', 'required');
+                commentsTextarea?.classList.add('border-rose-500/50', 'focus:border-rose-500', 'focus:ring-rose-500');
+                commentsTextarea?.classList.remove('border-slate-700', 'focus:border-teal-500', 'focus:ring-teal-500');
+                requiredAsterisk?.classList.remove('hidden');
+                if (commentsRequirementLabel) {
+                    commentsRequirementLabel.classList.remove('text-slate-400');
+                    commentsRequirementLabel.classList.add('text-rose-400', 'font-semibold');
+                }
+            } else {
+                commentsTextarea?.removeAttribute('required');
+                commentsTextarea?.classList.remove('border-rose-500/50', 'focus:border-rose-500', 'focus:ring-rose-500');
+                commentsTextarea?.classList.add('border-slate-700', 'focus:border-teal-500', 'focus:ring-teal-500');
+                requiredAsterisk?.classList.add('hidden');
+                if (commentsRequirementLabel) {
+                    commentsRequirementLabel.classList.remove('text-rose-400', 'font-semibold');
+                    commentsRequirementLabel.classList.add('text-slate-400');
+                }
+            }
         }
+
+        decisionRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateRequirementState(this.value === 'rejected');
+            });
+        });
+
+        @if(old('decision') === 'rejected')
+            updateRequirementState(true);
+        @endif
+
+        document.getElementById('decisionForm')?.addEventListener('submit', function() {
+            const btn = document.getElementById('submitDecisionBtn');
+            const spinner = document.getElementById('submitDecisionSpinner');
+            const text = document.getElementById('submitDecisionText');
+            if (btn) {
+                btn.disabled = true;
+                spinner?.classList.remove('hidden');
+                if (text) text.textContent = '{{ __('app.submitting_decision') }}';
+            }
+        });
     });
 </script>
 @endsection
