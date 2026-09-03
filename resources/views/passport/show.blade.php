@@ -367,21 +367,37 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 @foreach($pendingApprovals as $approval)
-                    <div class="rounded-xl border border-indigo-500/20 bg-slate-900/80 p-3.5 flex flex-col justify-between">
+                    @php
+                        // Check if this link is gated by Stage 4 Step 6 prerequisite
+                        $isStage4Gated = (min(4, $current_stage + 1) === 4 && ($patient->activity_step ?? 0) < 6);
+                    @endphp
+                    <div class="rounded-xl border {{ $isStage4Gated ? 'border-amber-500/40 bg-slate-900/90' : 'border-indigo-500/20 bg-slate-900/80' }} p-3.5 flex flex-col justify-between">
                         <div class="mb-3">
                             <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="font-bold text-indigo-300">{{ __('app.role_' . $approval['role']) }}</span>
-                                <span class="text-xs text-amber-400 font-semibold">{{ __('app.status_pending') }}</span>
+                                <span class="font-bold {{ $isStage4Gated ? 'text-amber-300' : 'text-indigo-300' }}">{{ __('app.role_' . $approval['role']) }}</span>
+                                @if($isStage4Gated)
+                                    <span class="inline-flex items-center gap-1 text-[11px] text-amber-300 font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/40">
+                                        <svg class="h-3 w-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        Locked: Step 6 Req.
+                                    </span>
+                                @else
+                                    <span class="text-xs text-amber-400 font-semibold">{{ __('app.status_pending') }}</span>
+                                @endif
                             </div>
                             <div class="text-xs text-slate-300 truncate" title="{{ $approval['name'] }}">
                                 {{ $approval['name'] }}
                             </div>
+                            @if($isStage4Gated)
+                                <p class="text-[11px] text-amber-300/90 mt-2 bg-amber-950/40 p-2 rounded-lg border border-amber-500/25 leading-relaxed">
+                                    🔒 <strong>CDC Protocol Gate:</strong> Final clearance is locked until Step 6 is finished (Current: Step {{ $patient->activity_step ?? 1 }}). Clicking below tests the 403 safety gate.
+                                </p>
+                            @endif
                         </div>
 
                         <a href="{{ $approval['link_url'] }}" target="_blank"
-                           class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3 py-2 text-xs font-bold text-white shadow-md transition">
-                            <span>{{ __('app.open_link') }}</span>
-                            <svg class="h-3.5 w-3.5 text-indigo-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg {{ $isStage4Gated ? 'bg-amber-600/80 hover:bg-amber-600 text-white font-bold' : 'bg-indigo-600 hover:bg-indigo-500 text-white font-bold' }} px-3 py-2 text-xs shadow-md transition">
+                            <span>{{ $isStage4Gated ? 'Test Safety Gate (403)' : __('app.open_link') }}</span>
+                            <svg class="h-3.5 w-3.5 {{ $isStage4Gated ? 'text-amber-200' : 'text-indigo-200' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
                         </a>

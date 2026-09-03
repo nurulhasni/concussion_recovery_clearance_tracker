@@ -77,13 +77,13 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="font-bold text-white text-xs">2. Jordan Taylor</span>
-                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-500/40">Stage 3</span>
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-500/40">Stage 2</span>
                             </div>
                             <p class="text-[11px] text-slate-400 mb-2">
-                                <strong>Active Rehab (Day 11).</strong> Step 2/6 Return to Play.
+                                <strong>School Recovery (Day 8).</strong> Return-to-Learn stage.
                             </p>
                             <div class="text-[11px] text-teal-300/90 bg-teal-950/30 p-2 rounded-lg border border-teal-500/20 mb-3">
-                                💡 <strong>Demo This:</strong> Show the <em>CDC 6-Step Physical Progression</em> and scroll down to open the Doctor & School review portal links without logging in.
+                                💡 <strong>Demo This:</strong> Scroll to the bottom panel to open the <em>Doctor</em> and <em>School</em> review portals without logging in, and test multi-party approvals!
                             </div>
                         </div>
                     </div>
@@ -93,13 +93,13 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="font-bold text-white text-xs">3. Maya Chen</span>
-                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">Stage 4</span>
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">Stage 3 &bull; Step 3</span>
                             </div>
                             <p class="text-[11px] text-slate-400 mb-2">
-                                <strong>Full Recovery (Day 22).</strong> 100% Cleared.
+                                <strong>Physical Progression (Day 10).</strong> CDC 6-Step Return-to-Play.
                             </p>
                             <div class="text-[11px] text-teal-300/90 bg-teal-950/30 p-2 rounded-lg border border-teal-500/20 mb-3">
-                                💡 <strong>Demo This:</strong> Show the final goal: all 4 milestones cleared, zero restrictions, and official clearance granted to return to competitive sports.
+                                💡 <strong>Demo This:</strong> Click the approver links to showcase the <strong>CDC 403 Safety Gate</strong> (Final Clearance is blocked before Step 6!). Then log 3 daily reports to reach Step 6 and unlock the portals!
                             </div>
                         </div>
                     </div>

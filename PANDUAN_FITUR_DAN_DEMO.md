@@ -80,25 +80,27 @@ Aplikasi membagi pemulihan menjadi 4 tonggak pencapaian resmi:
 
 ---
 
-### Menit 2: Jordan Taylor (Mendemonstrasikan Latihan Fisik & Konsensus Multi-Pihak)
-1. Buka akun **Jordan Taylor** (Milestone 3 - *Active Rehab*).
+### Menit 2: Jordan Taylor (Mendemonstrasikan Akomodasi Sekolah & Konsensus Multi-Pihak)
+1. Buka akun **Jordan Taylor** (Milestone 2 - *Return to Learn*).
 2. **Ucapkan:**  
-   > *"Ketika kondisi pasien membaik, pasien masuk ke Milestone 3 seperti Jordan Taylor. Di sini ada 2 fitur utama:"*
-3. Tunjukkan bagian **CDC 6-Step Return to Play Progression**:
-   > *"Tahap 3 memiliki sub-langkah fisik: mulai dari jalan santai, latihan aerobik ringan, hingga latihan tanpa kontak."*
-4. Tunjukkan bagian **Clearance Approvals** di bawah:
-   > *"Untuk maju ke tahap berikutnya, Jordan butuh persetujuan dari 3 pihak: Dokter, Sekolah, dan Orang Tua. Kita bisa melihat status masing-masing pihak secara transparan."*
-5. Di panel demo bagian bawah, klik tombol **Open Review Portal**:
-   > *"Ini adalah tampilan yang dilihat oleh Dokter atau Guru Olahraga melalui tautan aman tanpa perlu login. Mereka cukup memilih Approve/Reject dan memberikan catatan klinis."*
+   > *"Ketika kondisi pasien membaik, pasien masuk ke Milestone 2 seperti Jordan Taylor. Di sini pasien sudah boleh masuk kelas dengan akomodasi belajar (waktu istirahat tambahan)."*
+3. Tunjukkan bagian **Clearance Approvals** di bawah:
+   > *"Untuk maju ke Milestone 3 (Latihan Fisik), Jordan butuh persetujuan dari Dokter dan Sekolah. Kita bisa melihat status masing-masing pihak secara transparan."*
+4. Di panel demo bagian bawah, klik tombol **Open Review Portal**:
+   > *"Ini adalah tampilan yang dilihat oleh Dokter atau Koordinator Sekolah melalui tautan aman tanpa perlu login. Mereka cukup memilih Approve/Reject dan memberikan catatan klinis."*
 
 ---
 
-### Menit 3: Maya Chen (Mendemonstrasikan Paspor Pemulihan Penuh)
-1. Buka akun **Maya Chen** (Milestone 4 - *Full Clearance*).
+### Menit 3: Maya Chen (Mendemonstrasikan Latihan Fisik CDC & Fitur Pengaman 403)
+1. Buka akun **Maya Chen** (Milestone 3 - *Active Rehab*, Step 3/6).
 2. **Ucapkan:**  
-   > *"Terakhir, ini adalah Maya Chen. Maya telah berhasil menyelesaikan seluruh siklus pemulihan. Seluruh pihak terkait telah memberikan clearance resmi, dan paspornya menyatakan bahwa Maya aman 100% untuk kembali bertanding."*
-3. **Penutup:**  
-   > *"Dengan Concussion Recovery Tracker, tidak ada lagi anak yang kembali ke lapangan sebelum otaknya benar-benar pulih. Terima kasih."*
+   > *"Berikutnya adalah Maya Chen yang sedang menjalani Milestone 3 (Latihan Fisik Bertahap). Perhatikan bagian CDC 6-Step Return to Play Progression."*
+3. Tunjukkan sub-langkah fisik:
+   > *"Maya saat ini berada di Step 3. Sekarang mari kita tunjukkan fitur kepatuhan medis kami: jika dokter atau sekolah mencoba membuka link persetujuan Final Clearance (Milestone 4) sekarang, apa yang terjadi?"*
+4. Klik tombol **Test Safety Gate (403)** di panel demo bawah:
+   > *"Sistem secara ketat memblokir dengan kode 403 Access Restricted! CDC melarang keras pemberian izin bertanding penuh sebelum atlet menyelesaikan seluruh 6 langkah latihan fisik."*
+5. Kembali ke paspor Maya Chen & klik **Log Daily Symptoms** (masukkan gejala ringan):
+   > *"Begitu Maya menyelesaikan langkah-langkah latihannya hingga mencapai Step 6, gerbang persetujuan Final Clearance otomatis terbuka!"*
 
 ---
 
@@ -106,6 +108,7 @@ Aplikasi membagi pemulihan menjadi 4 tonggak pencapaian resmi:
 
 | Pertanyaan | Jawaban Singkat & Tepat |
 |---|---|
+| **Kenapa saat klik approval Maya Chen muncul error 403?** | **Ini adalah fitur pengaman medis resmi CDC.** Maya Chen berada di Milestone 3 Step 3. Protokol CDC HEADS UP melarang pemberian izin bertanding (*Final Clearance*) jika belum menyelesaikan Step 6. Sistem dengan sengaja memblokir akses tersebut hingga Step 6 tercapai. |
 | **Apakah AI di sini menggantikan dokter?** | **Sama sekali tidak.** AI hanya bersifat asisten administratif (*assistive tool*) untuk mengekstrak gejala dari bahasa bebas dan merangkum tren. Keputusan izin medis tetap 100% berada di tangan Dokter berlisensi. |
 | **Bagaimana jika pasien memasukkan gejala bahaya?** | Sistem memiliki *safety guardrail* lapis ganda. Jika ada kata kunci bahaya (*seizure, vomiting, blackout*), sistem otomatis memicu status bahaya klinis dan menurunkan tahapan pasien (*auto-downgrade*) ke Tahap 1. |
 | **Kenapa dokter dan pihak sekolah tidak perlu registrasi akun?** | Untuk menghilangkan friksi. Tenaga medis dan guru sangat sibuk. Kami menggunakan *secure 64-character token* sekali pakai dengan masa kedaluwarsa 7 hari yang dikirim langsung ke mereka. |
