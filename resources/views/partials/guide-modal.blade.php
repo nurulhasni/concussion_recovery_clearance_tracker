@@ -114,20 +114,20 @@
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div class="p-3 rounded-xl bg-slate-900/70 border border-white/[0.06]">
-                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 1: Rest & Cognitive Pause</div>
-                        <p class="text-[11px] text-slate-400">Strict limit on screen time (20-30 mins max), no homework, zero sports. Cleared by Doctor.</p>
+                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 1: Initial Assessment</div>
+                        <p class="text-[11px] text-slate-400">Medical baseline diagnosis & initial recovery plan (Rest & cognitive pause). Cleared by Doctor.</p>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/70 border border-white/[0.06]">
-                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 2: Return to Learn</div>
-                        <p class="text-[11px] text-slate-400">Classroom attendance with accommodations (extra breaks, delayed exams). Cleared by Doctor + School.</p>
+                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 2: School Recovery</div>
+                        <p class="text-[11px] text-slate-400">Return-to-Learn academic accommodations & classroom rest protocols active. Cleared by Doctor + School.</p>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/70 border border-white/[0.06]">
-                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 3: Active Rehab & Return to Play</div>
-                        <p class="text-[11px] text-slate-400">CDC 6-Step physical protocol (walking, light aerobic, non-contact drills). Cleared by Doctor + School + Parent.</p>
+                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 3: Graduated Physical Activity</div>
+                        <p class="text-[11px] text-slate-400">CDC 6-Step Return-to-Play graduated physical progression active. Cleared by Doctor + School + Parent.</p>
                     </div>
                     <div class="p-3 rounded-xl bg-slate-900/70 border border-white/[0.06]">
-                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 4: Full Sport & Life Clearance</div>
-                        <p class="text-[11px] text-slate-400">100% symptom-free recovery. Athlete is officially cleared to return to full-contact practice and competition.</p>
+                        <div class="font-bold text-teal-300 text-xs mb-0.5">Milestone 4: Final Clearance</div>
+                        <p class="text-[11px] text-slate-400">Full multidisciplinary medical & academic clearance verified. 100% authorized for competition.</p>
                     </div>
                 </div>
             </div>

@@ -14,14 +14,14 @@
 ---
 
 ## 🗺️ 2. Perjalanan Pemulihan (4 Milestone Recovery)
-Aplikasi membagi pemulihan menjadi 4 tonggak pencapaian resmi:
+Aplikasi membagi pemulihan menjadi 4 tonggak pencapaian resmi yang selaras persis dengan kartu dashboard di layar:
 
-| Milestone | Nama Tahap | Deskripsi & Batasan Aktivitas | Siapa yang Harus Menyetujui? |
-|---|---|---|---|
-| **Milestone 1** | **Rest & Cognitive Pause** | Istirahat total. Batas layar maksimal 20-30 menit, tidak ada PR/tugas sekolah berat, tidak ada olahraga. | Dokter |
-| **Milestone 2** | **Return to Learn** | Boleh kembali masuk kelas dengan akomodasi belajar (waktu istirahat tambahan, bebas ujian berat), tapi belum boleh olahraga. | Dokter + Pihak Sekolah |
-| **Milestone 3** | **Active Rehab & Return to Play** | Mengikuti protokol latihan fisik 6 langkah (*CDC 6-Step Return to Play*), mulai dari jalan santai hingga latihan spesifik tanpa kontak. | Dokter + Pihak Sekolah + Orang Tua |
-| **Milestone 4** | **Full Sport & Life Clearance** | Pemulihan tuntas 100%. Diizinkan kembali bertanding dalam olahraga kontak penuh (*full contact practice*). | **Selesai (Status: Cleared)** |
+| Milestone | Nama Resmi di UI | Konsep Klinis CDC | Deskripsi Resmi & Batasan Aktivitas | Siapa yang Menyetujui? |
+|---|---|---|---|---|
+| **Milestone 1** | **Initial Assessment** | *Rest & Cognitive Pause* | **Medical baseline diagnosis and initial recovery plan established.**<br><small>Istirahat total, batas layar 20-30 menit, tidak ada PR berat, belum boleh olahraga.</small> | Dokter |
+| **Milestone 2** | **School Recovery** | *Return to Learn* | **Return-to-Learn academic accommodations and classroom rest protocols active.**<br><small>Kembali masuk kelas dengan akomodasi (istirahat tambahan, bebas ujian berat), belum boleh olahraga.</small> | Dokter + Pihak Sekolah |
+| **Milestone 3** | **Graduated Physical Activity** | *CDC 6-Step Return-to-Play* | **CDC 6-Step Return-to-Play graduated physical progression active.**<br><small>Latihan fisik bertahap 6 langkah dari jalan santai hingga latihan tanpa kontak.</small> | Dokter + Pihak Sekolah + Orang Tua |
+| **Milestone 4** | **Final Clearance** | *Full Multidisciplinary Clearance* | **Full multidisciplinary medical and academic clearance verified.**<br><small>Pemulihan tuntas 100%, izin resmi bertanding dalam olahraga kontak penuh.</small> | **Status: Cleared 100%** |
 
 ---
 
