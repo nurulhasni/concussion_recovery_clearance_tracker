@@ -2,7 +2,7 @@
 
 > **"A student shouldn't have to carry their recovery paperwork between a doctor, school, and sports team."**
 
-Concussion Recovery Clearance Tracker is a multi-stakeholder recovery coordination and clearance platform designed for pediatric and adolescent student-athletes. It creates a unified, transparent, and auditable bridge connecting **Students & Parents**, **Schools**, and **Healthcare Providers (Doctors)** throughout the entire recovery lifecycle — assisted by AI for symptom analysis while strictly preserving human-in-the-loop medical authority.
+Concussion Recovery Clearance Tracker is a multi-stakeholder recovery coordination and clearance platform designed for pediatric and adolescent student-athletes. It creates a unified, transparent, and auditable bridge connecting **Students & Parents**, **Schools**, and **Healthcare Providers (Doctors)** throughout the entire recovery lifecycle assisted by AI for symptom analysis while strictly preserving human-in-the-loop medical authority.
 
 ---
 
