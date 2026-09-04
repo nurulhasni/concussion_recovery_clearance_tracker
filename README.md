@@ -64,18 +64,22 @@ AI_MODEL=llama-3.3-70b-versatile
 
 ---
 
-## 🔐 Authentication & Multi-Party Approval Workflow
+## 🔐 Authentication, Approvals & Governance
 
 * **Student / Parent Access**: Log in via demo magic link (enter parent email -> single-use login token generated -> verified -> session established). Protected by `EnsurePatientAuthenticated` middleware with strict cross-patient isolation (Patient A cannot view Patient B's records).
 * **Approver Access (Doctors & School Staff)**: One-time tokenized URLs (`/approve/{token}`). No bulky account registration required for external clinicians or busy school nurses.
 * **Replay & Consensus Protection**: Single-use tokens are consumed immediately upon submission (`is_used: true`). Multi-approver stages (e.g. Doctor + School) only advance when **100%** of required parties approve with zero rejections.
+* **Clinical Rejection / Hold Notes Requirement**: When an approver decides to reject or hold a milestone, clinical notes explaining why are **conditionally required by validation** (`required_if:decision,rejected`). These notes are displayed directly in the patient's Recovery Passport and confirmation screen so parents and providers know what is required next.
+* **Bilingual Localization (EN & ID)**: Full internationalization support with an instant toggle in the navbar. Clinical status terms maintain fixed schema identifiers while UI copy and guidance are available in English and Bahasa Indonesia.
+* **In-App Demo Guide**: An interactive "💡 Guide & Demo Flow" modal accessible directly from the top navigation bar provides a 3-minute presentation cheat sheet and architectural walkthrough.
 
 ---
 
-## 🚀 Quick Start & Demo Testing
+## 🚀 Quick Start & Local Setup
 
 ### Requirements
 * PHP 8.2+
+* Node.js & npm (for Tailwind CSS v4 asset compilation)
 * Composer
 * SQLite or MySQL
 
@@ -84,54 +88,68 @@ AI_MODEL=llama-3.3-70b-versatile
 git clone <repository-url>
 cd concussion_recovery_clearance_tracker
 composer install
+npm install
 cp .env.example .env
 php artisan key:generate
 ```
 
-### 2. Configure AI Provider (Optional for AI generation)
+### 2. Build Frontend Assets
+```bash
+npm run build
+# Or run hot-reloading dev server:
+npm run dev
+```
+
+### 3. Configure AI Provider (Optional for AI symptom extraction)
 Add your Gemini or Groq/OpenAI API key to `.env`:
 ```env
 AI_PROVIDER=gemini
 GEMMA_API_KEY=your_gemini_api_key
 ```
 
-### 3. Migrate and Seed Demo Data
+### 4. Migrate and Seed Demo Data
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-### 4. Run Development Server
+### 5. Run Development Server
 ```bash
 php artisan serve
 ```
 Open `http://127.0.0.1:8000` in your browser.
 
+> 💡 **Cloud Deployments & Quick Reset**:
+> For cloud environments without terminal shell access (e.g., Render free tier), visiting `/reset-database` (or clicking the *Reset Demo Database* button on the login screen) executes `migrate:fresh --seed` automatically to restore all 3 demo accounts to their clean initial state.
+
 ---
 
 ## 🧪 Demo Patient Accounts Available Out of the Box
 
-The database seeder pre-populates 3 realistic clinical recovery scenarios:
+The database seeder pre-populates 3 realistic clinical recovery scenarios accessible from the quick-login cards:
 
-| Student Name | Parent Email | Current Milestone | Recovery Scenario |
+| Student Name | Parent Email | Current Milestone | Recovery Scenario & Testing Tips |
 | :--- | :--- | :--- | :--- |
-| **Maya Chen** | `maya.parents@example.com` | **Milestone 3 (Step 3/6)** | Improving soccer forward with 7 days of symptom logs & Milestone 4 pending approval links. |
-| **Alex Rivera** | `alex.rivera@example.com` | **Milestone 1 (Initial)** | Fresh injury (day 3), complete cognitive rest with Doctor link for Milestone 2. |
-| **Jordan Taylor** | `jordan.taylor@example.com` | **Milestone 2 (School)** | Track athlete attending classes under RTL accommodations, with Doctor & School links for Milestone 3. |
+| **Maya Chen** | `maya.chen@example.com` | **Milestone 3 (Step 3/6)** | Improving soccer forward with 7 days of logs. <br>⚠️ **CDC Safety Gate Demo**: Attempting to open her Final Clearance review links prematurely triggers an intentional **403 Access Restricted** safety page because CDC protocol forbids clearance before Step 6. Log 3 mild daily reports to advance her to Step 6 and unlock the portals! |
+| **Alex Rivera** | `alex.rivera@example.com` | **Milestone 1 (Initial)** | Fresh injury (day 3), complete cognitive rest with Doctor link for Milestone 2. <br>💡 **AI Demo**: Click *Log Daily Symptoms* to test free-text extraction, layperson summaries, and Red Flag safety auto-downgrades. |
+| **Jordan Taylor** | `jordan.taylor@example.com` | **Milestone 2 (School)** | Track athlete attending classes under RTL accommodations, with Doctor & School links for Milestone 3. <br>💡 **Approvals Demo**: Scroll down to open the Doctor and School review portals to test multi-party sign-off. |
 
 ---
 
 ## 🛡️ Automated Verification Suite
 
-Run the full automated test suite covering all security, consensus, auto-downgrade, and AI provider features:
+The platform includes an automated test suite covering security boundaries, approval workflows, clinical step gating, and AI guardrails:
+
 ```bash
 php artisan test
 ```
+
 * **Authentication & Cross-Patient Isolation**: 8 tests
-* **Approval Flow & Multi-Party Consensus**: 7 tests
+* **Approval Flow, Consensus & Rejection Governance**: 18 tests
 * **Symptom Intake & Clinical Step Auto-Downgrade**: 5 tests
 * **Keyword Safety Guardrails & Fail-Safe Parsing**: 5 tests
-* **AI Provider Binding**: 2 tests
-* **29 total tests, 64 assertions, 100% passing.**
+* **AI Provider Binding & Modular Swapping**: 2 tests
+* **Bilingual Localization (EN / ID)**: 2 tests
+* **40 total tests, 143 assertions, 100% passing.**
 
 ---
 
